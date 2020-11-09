@@ -1,0 +1,43 @@
+name: openstack-toolkit
+version: '1.0'
+summary: Toolkit for debugging Openstack
+description:
+  Set of tools to help debugging Openstack problems.
+confinement: strict 
+grade: stable
+base: core18
+environment:
+  TMPDIR: $SNAP_COMMON/tmp
+  REQUESTS_CA_BUNDLE: /etc/ssl/certs/ca-certificates.crt  # need this due to pip python-certifi used by python-openstackclient
+
+apps:
+  octavia:
+    command: octavia/run.sh
+    plugs: [home, network]
+  neutron:
+    command: neutron/run.sh
+    plugs: [home, network, network-control]
+parts:
+  octavia-checks:
+    source: .
+    plugin: dump
+    stage-packages:
+      - coreutils
+      - bsdmainutils
+      - ipcalc
+      - jq
+      - curl
+  openstackclients:
+    plugin: python
+    python-version: python3
+    python-packages:
+      - python-openstackclient
+    constraints: https://raw.githubusercontent.com/openstack/requirements/stable/ussuri/upper-constraints.txt
+    build-packages:
+      - libffi-dev
+      - libssl-dev
+      - libxml2-dev
+      - libxslt1-dev
+      - pkg-config
+      - gcc
+
