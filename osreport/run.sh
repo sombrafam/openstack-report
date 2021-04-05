@@ -27,7 +27,7 @@ check_plugin_list(){
 
 usage () {
 cat << EOF
-Usage: openstack-toolkit.osreport <options>
+Usage: os-report <options>
 
 Description:
     Collects OpenStack information for a cloud and builds useful relations
@@ -110,8 +110,12 @@ for plugin in ${plugins}; do
     . ${api_plugins}/${plugin}
 done
 
-echo "Compressing results..."
-REPORT_NAME="osreport-$(date +%Y-%m-%d_%H%M).tar.xz"
-tar -Jcvf ${REPORT_NAME} ${OSREPORT_OUTPUT_DIR} &> /dev/null
-echo "Done. Report created in ${REPORT_NAME}"
+if [ -z ${OS_REPORT_DEBUG} ]; then
+    echo "Compressing results..."
+    REPORT_NAME="osreport-$(date +%Y-%m-%d_%H%M).tar.xz"
+    tar -Jcvf ${REPORT_NAME} ${OSREPORT_OUTPUT_DIR} &> /dev/null
+    echo "Done. Report created in ${REPORT_NAME}"
+else
+    echo "Done. Report created in ${OSREPORT_OUTPUT_DIR}"
+fi
 

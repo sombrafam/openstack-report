@@ -1,22 +1,20 @@
-name: openstack-toolkit
+name: os-report
 version: '1.0'
 summary: Toolkit for debugging Openstack
 description:
-  Set of tools to help debugging Openstack problems.
-confinement: strict 
+  Collects information from OpenStack Clouds
+confinement: strict
 grade: stable
 base: core18
 environment:
   TMPDIR: $SNAP_COMMON/tmp
-  REQUESTS_CA_BUNDLE: /etc/ssl/certs/ca-certificates.crt  # need this due to pip python-certifi used by python-openstackclient
+  # need this due to pip python-certifi used by python-openstackclient
+  REQUESTS_CA_BUNDLE: /etc/ssl/certs/ca-certificates.crt
 
 apps:
   octavia:
-    command: octavia/run.sh
+    command: osreport/run.sh
     plugs: [home, network]
-  neutron:
-    command: neutron/run.sh
-    plugs: [home, network, network-control]
 parts:
   octavia-checks:
     source: .
