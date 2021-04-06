@@ -49,8 +49,15 @@ Environment:
     OS_REGION_NAME
     OS_USERNAME
     OS_USER_DOMAIN_NAME
+
+    # Won't compress the results and print debug information
+    OS_REPORT_DEBUG
 EOF
 }
+
+# x is a dummy value just so the script does not break when OS_REPORT_DEBUG is
+# not set.
+[[ -z ${OS_REPORT_DEBUG+x} ]] || set -x
 
 plugins=${SUPPORTED_PLUGINS}
 while (($#)); do
@@ -110,12 +117,14 @@ for plugin in ${plugins}; do
     . ${api_plugins}/${plugin}
 done
 
-if [ -z ${OS_REPORT_DEBUG} ]; then
-    echo "Compressing results..."
-    REPORT_NAME="osreport-$(date +%Y-%m-%d_%H%M).tar.xz"
-    tar -Jcvf ${REPORT_NAME} ${OSREPORT_OUTPUT_DIR} &> /dev/null
+echo "Compressing results..."
+REPORT_NAME="osreport-$(date +%Y-%m-%d_%H%M).tar.xz"
+tar -Jcvf ${REPORT_NAME} ${OSREPORT_OUTPUT_DIR} &> /dev/null
+
+if [[ -z ${OS_REPORT_DEBUG+x} ]]; then
     echo "Done. Report created in ${REPORT_NAME}"
+    rm -rf ${OSREPORT_OUTPUT_DIR}
 else
-    echo "Done. Report created in ${OSREPORT_OUTPUT_DIR}"
+    echo "Done. Report created in ${REPORT_NAME} and ${OSREPORT_OUTPUT_DIR}"
 fi
 

@@ -8,7 +8,7 @@ mkdir -p ${OUTPUT_DIR}
 SERVERS_OUTPUT_DIR=${OUTPUT_DIR}/servers
 mkdir -p ${SERVERS_OUTPUT_DIR}
 openstack server list > ${SERVERS_OUTPUT_DIR}/list
-for i in $(openstack server list -c ID -f value); do
+for i in $(openstack server list --all-projects -c ID -f value); do
     mkdir -p ${SERVERS_OUTPUT_DIR}/${i}
     openstack server show ${i} > ${OUTPUT_DIR}/servers/${i}/info
     mkdir -p  ${SERVERS_OUTPUT_DIR}/${i}/ports

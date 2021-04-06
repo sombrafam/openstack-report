@@ -40,3 +40,32 @@ for i in $(openstack service list -c 'ID' -c 'Name' -f csv --quote none | grep -
     mkdir -p ${SERVICE_OUTPUT_DIR}/${id}_${name}
     openstack service show ${id} > ${SERVICE_OUTPUT_DIR}/${id}_${name}/info
 done
+
+AGGREGATE_OUTPUT_DIR=${OUTPUT_DIR}/aggregates
+mkdir -p ${AGGREGATE_OUTPUT_DIR}
+openstack aggregate list > ${AGGREGATE_OUTPUT_DIR}/list
+for i in $(openstack aggregate list -c 'ID' -c 'Name' -f csv --quote none | grep -v ID); do
+    id=$(echo ${i} | cut -d, -f1)
+    name=$(echo ${i} | cut -d, -f2)
+    mkdir -p ${AGGREGATE_OUTPUT_DIR}/${id}_${name}
+    openstack aggregate show ${id} > ${AGGREGATE_OUTPUT_DIR}/${id}_${name}/info
+    mkdir -p ${AGGREGATE_OUTPUT_DIR}/${id}_${name}/hosts
+    for j in $(openstack aggregate show ${i} -f json | jq -r '.hosts[]'); do
+        ln -rs ${HYPERVISORS_OUTPUT_DIR}/${j} ${AGGREGATE_OUTPUT_DIR}/${id}_${name}/hosts/${j}
+    done
+done
+
+SERVICE_PROV_OUTPUT_DIR=${OUTPUT_DIR}/service_providers
+mkdir -p ${SERVICE_PROV_OUTPUT_DIR}
+openstack service provider list > ${SERVICE_PROV_OUTPUT_DIR}/list
+
+COMPUTE_AGENTS_OUTPUT_DIR=${OUTPUT_DIR}/compute_agents
+mkdir -p ${COMPUTE_AGENTS_OUTPUT_DIR}
+openstack compute agent list > ${COMPUTE_AGENTS_OUTPUT_DIR}/list
+
+COMPUTE_SERVICES_OUTPUT_DIR=${OUTPUT_DIR}/compute_services
+mkdir -p ${COMPUTE_SERVICES_OUTPUT_DIR}
+openstack compute service list > ${COMPUTE_SERVICES_OUTPUT_DIR}/list
+
+mkdir -p ${HYPERVISORS_OUTPUT_DIR}
+openstack hypervisor stats show > ${HYPERVISORS_OUTPUT_DIR}/stats

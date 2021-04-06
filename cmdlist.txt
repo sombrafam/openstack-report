@@ -1,41 +1,40 @@
 # # nova-hosts
-# openstack hypervisor list',
-# openstack hypervisor show'
-# openstack host list',
-# openstack host show'
-# openstack region list
-# openstack region show
-# openstack service list',
-# openstack service show'
-
-
-# openstack aggregate list',
-# openstack aggregate show'
-# openstack service provider list',
-# openstack service provider show'
-# openstack compute agent list',
-# openstack compute service list',
+# openstack hypervisor list - OK
+# openstack hypervisor show - OK
+# openstack host list - OK
+# openstack host show - OK
+# openstack region list - OK
+# openstack region show - OK
+# openstack service list - OK
+# openstack service show - OK
+# openstack aggregate list - OK
+# openstack aggregate show - OK
+# openstack service provider list - OK
+# openstack service provider show
+# openstack compute agent list - OK
+# openstack compute service list - OK
+# openstack hypervisor stats show
 
 # # nova servers
-# openstack availability zone list'
-# openstack hypervisor stats show'
-# openstack versions show'
-# openstack flavor list',
-# openstack flavor show'
-# openstack floating ip list',
-# openstack floating ip show'
-# openstack image list',
-# openstack image show',
-# openstack image member list'
-# openstack keypair list',
-# openstack keypair show'
-# openstack quota list',
-# openstack quota show'
-# openstack server list',
-# openstack server show',
-# openstack server event show'
-# openstack server group list',
-# openstack server group show'
+# openstack availability zone list
+
+# openstack versions show
+# openstack flavor list
+# openstack flavor show
+# openstack floating ip list
+# openstack floating ip show
+# openstack image list
+# openstack image show
+# openstack image member list
+# openstack keypair list
+# openstack keypair show
+# openstack quota list
+# openstack quota show
+# openstack server list
+# openstack server show
+# openstack server event show
+# openstack server group list
+# openstack server group show
 
 # # keystone
 # openstack domain list
