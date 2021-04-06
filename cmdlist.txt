@@ -34,25 +34,26 @@
 # openstack server group show - WBD
 
 ## keystone
-# openstack domain list
-# openstack domain show
-# openstack catalog list
-# openstack catalog show
-# openstack endpoint group list
-# openstack endpoint group show
-# openstack endpoint list
-# openstack endpoint show
-# openstack group list
-# openstack group show
-# openstack identity provider list
-# openstack identity provider show
-# openstack project list
-# openstack project show
-# openstack quota show
-# openstack user list
-# openstack user show
-# openstack role list
-# openstack role show
+# openstack domain list - OK
+# openstack domain show - OK
+# openstack catalog list - OK
+# openstack catalog show - WBD
+# openstack endpoint group list - OK
+# openstack endpoint group show - WBD
+# openstack endpoint list - OK
+# openstack endpoint show - WBD
+# openstack group list - OK
+# openstack group show - WBD
+# openstack identity provider list - OK
+# openstack identity provider show - WBD
+
+# openstack project list - OK
+# openstack project show - OK
+# openstack quota show - OK
+# openstack user list - OK
+# openstack user show - OK
+# openstack role list - OK
+# openstack role show - OK
 
 ## placement # --os-placement-api-version 1.6
 # openstack resource provider aggregate list

@@ -3,7 +3,7 @@ export LIB_PATH=$(dirname $0)/../lib
 
 export OSREPORT_OUTPUT_DIR=$(mktemp -d -p . osreport.XXXXXX)
 
-SUPPORTED_PLUGINS="neutron,nova,octavia,nova-hypervisors"
+SUPPORTED_PLUGINS="neutron,nova,octavia,nova-hypervisors,keystone"
 
 check_plugin_list(){
     IFS=","
@@ -35,8 +35,8 @@ Description:
 
 Options:
   --help: Print this info.
-  --plugins <plugins>: Can be any of: neutron, nova, nova-hypervisors or octavia. You can
-    use multiple options separated by commas.
+  --plugins <plugins>: Can be any of: neutron, nova, nova-hypervisors, keystone
+    or octavia. You can use multiple options separated by commas.
   --all-plugins: Runs all the above plugins. Can take some time to run.
 
 Environment:

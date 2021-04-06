@@ -1,0 +1,59 @@
+#!/bin/bash -u
+
+OUTPUT_DIR=${OSREPORT_OUTPUT_DIR}/keystone_info
+mkdir -p ${OUTPUT_DIR}
+
+openstack catalog list > ${OUTPUT_DIR}/catalog
+openstack endpoint group list > ${OUTPUT_DIR}/endpoint_groups
+openstack endpoint list > ${OUTPUT_DIR}/endpoints
+openstack group list > ${OUTPUT_DIR}/groups
+openstack identity provider list > ${OUTPUT_DIR}/identity_providers
+
+USERS_OUTPUT_DIR=${OUTPUT_DIR}/users
+mkdir -p ${USERS_OUTPUT_DIR}
+openstack user list > ${USERS_OUTPUT_DIR}/list
+for i in $(openstack domain list -c 'ID' -f value); do
+    for j in $(openstack user list --domain ${i} -c 'ID' -c 'Name' -f csv --quote none | grep -v ID); do
+        id=$(echo ${j} | cut -d, -f1)
+        name=$(echo ${j} | cut -d, -f2)
+        mkdir -p ${USERS_OUTPUT_DIR}/${id}_${name}
+        openstack user show ${id} > ${USERS_OUTPUT_DIR}/${id}_${name}/info
+        # Not creating the links here as creating a 3 order loop might make this
+        # last forever.
+        openstack role assign list --user ${id} > ${USERS_OUTPUT_DIR}/${id}_${name}/roles
+    done
+done
+
+ROLES_OUTPUT_DIR=${OUTPUT_DIR}/roles
+mkdir -p ${ROLES_OUTPUT_DIR}
+openstack role list > ${ROLES_OUTPUT_DIR}/list
+for i in $(openstack role list -c 'ID' -c 'Name' -f csv --quote none | grep -v ID); do
+    id=$(echo ${i} | cut -d, -f1)
+    name=$(echo ${i} | cut -d, -f2)
+    mkdir -p ${ROLES_OUTPUT_DIR}/${id}_${name}
+    openstack role show ${id} > ${ROLES_OUTPUT_DIR}/${id}_${name}/info
+    mkdir -p ${ROLES_OUTPUT_DIR}/${id}_${name}/users
+    for j in $(openstack role assign list --role ${id} -c 'User' -f csv --quote none| grep -v User); do
+        userid=$(echo ${j} | cut -d, -f1)
+        username=$(openstack user show ${userid} -f json | jq -r '.name')
+        ln -rs ${USERS_OUTPUT_DIR}/${userid}_${username}  ${ROLES_OUTPUT_DIR}/${id}_${name}/users/${userid}_${username}
+    done
+done
+
+PROJECTS_OUTPUT_DIR=${OUTPUT_DIR}/projects
+mkdir -p ${PROJECTS_OUTPUT_DIR}
+openstack project list > ${PROJECTS_OUTPUT_DIR}/list
+for i in $(openstack project list -c 'ID' -c 'Name' -f csv --quote none | grep -v ID); do
+    id=$(echo ${i} | cut -d, -f1)
+    name=$(echo ${i} | cut -d, -f2)
+    mkdir -p ${PROJECTS_OUTPUT_DIR}/${id}_${name}
+    openstack project show ${id} > ${PROJECTS_OUTPUT_DIR}/${id}_${name}/info
+    openstack quota show ${id} > ${PROJECTS_OUTPUT_DIR}/${id}_${name}/quota
+    mkdir -p ${PROJECTS_OUTPUT_DIR}/${id}_${name}/users
+    openstack user list --project ${id} > ${PROJECTS_OUTPUT_DIR}/${id}_${name}/users/list
+    for j in $(openstack user list --project ${id} -c 'ID' -c 'Name' -f csv --quote none | grep -v ID); do
+        uid=$(echo ${j} | cut -d, -f1)
+        uname=$(echo ${j} | cut -d, -f2)
+        ln -rs ${USERS_OUTPUT_DIR}/${uid}_${uname} ${PROJECTS_OUTPUT_DIR}/${id}_${name}/users/${uid}_${uname}
+    done
+done
