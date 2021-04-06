@@ -1,4 +1,4 @@
-# # nova-hosts
+## nova-hosts
 # openstack hypervisor list - OK
 # openstack hypervisor show - OK
 # openstack host list - OK
@@ -13,59 +13,48 @@
 # openstack service provider show
 # openstack compute agent list - OK
 # openstack compute service list - OK
-# openstack hypervisor stats show
+# openstack hypervisor stats show - OK
 
-# # nova servers
-# openstack availability zone list
+## nova servers
+# openstack availability zone list - OK
+# openstack versions show - OK
 
-# openstack versions show
-# openstack flavor list
-# openstack flavor show
-# openstack floating ip list
-# openstack floating ip show
-# openstack image list
-# openstack image show
-# openstack image member list
-# openstack keypair list
-# openstack keypair show
-# openstack quota list
-# openstack quota show
-# openstack server list
-# openstack server show
-# openstack server event show
-# openstack server group list
-# openstack server group show
+# openstack flavor list - OK
+# openstack flavor show - OK
+# openstack image list - OK
+# openstack image show - OK
+# openstack image member list - WBD
+# openstack keypair list - OK
+# openstack keypair show - OK
 
-# # keystone
+# openstack server list - OK
+# openstack server show - OK
+# openstack server event show - WBD
+# openstack server group list - OK
+# openstack server group show - WBD
+
+## keystone
 # openstack domain list
 # openstack domain show
-
 # openstack catalog list
 # openstack catalog show
-
 # openstack endpoint group list
 # openstack endpoint group show
-
 # openstack endpoint list
 # openstack endpoint show
-
 # openstack group list
 # openstack group show
-
 # openstack identity provider list
 # openstack identity provider show
-
 # openstack project list
 # openstack project show
-
+# openstack quota show
 # openstack user list
 # openstack user show
-
 # openstack role list
 # openstack role show
 
-
-# # placement # --os-placement-api-version 1.6
+## placement # --os-placement-api-version 1.6
 # openstack resource provider aggregate list
 # openstack resource provider aggregate set
 # openstack resource provider allocation show
@@ -79,49 +68,39 @@
 # openstack resource provider usage show
 # openstack resource usage show
 
-# # neutron
-# openstack ip availability list
-# openstack ip availability show
-
+## neutron
 # openstack network agent list - OK
 # openstack network agent show - OK
-
-# openstack network flavor list
-# openstack network flavor show
-
 # openstack network list - OK
 # openstack network show - OK
 
+# openstack ip availability list
+# openstack ip availability show
+# openstack network flavor list
+# openstack network flavor show
 # openstack network meter list
 # openstack network meter show
-
 # openstack network rbac list
 # openstack network rbac show
-
 # openstack network segment list
-
 # openstack network segment show
 # openstack network service provider list
-
 # openstack subnet list
 # openstack subnet show
-
 # openstack subnet pool list
 # openstack subnet pool show
-
 # openstack port list
 # openstack port show
-
 # openstack router list
 # openstack router show
-
 # openstack security group list
 # openstack security group rule list
-
 # openstack security group rule show
 # openstack security group show
+# openstack floating ip list
+# openstack floating ip show
 
-# # octavia
+## octavia
 # openstack loadbalancer list
 # openstack loadbalancer show
 # openstack loadbalancer stats show
@@ -153,7 +132,7 @@
 # openstack loadbalancer listener stats show
 
 
-# # volume
+## volume
 # openstack volume backup list
 # openstack volume backup show
 

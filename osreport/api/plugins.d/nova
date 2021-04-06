@@ -1,3 +1,43 @@
 #!/bin/bash -eu
 
-# Basic nova information already collected in the nova-common module
+# Depends-on nova-common
+
+OUTPUT_DIR=${OSREPORT_OUTPUT_DIR}/nova_info
+mkdir -p ${OUTPUT_DIR}
+
+AZS_OUTPUT=${OUTPUT_DIR}/availability_zones
+openstack availability zone list > ${AZS_OUTPUT}
+
+VERSIONS_OUTPUT=${OUTPUT_DIR}/versions
+openstack versions show > ${VERSIONS_OUTPUT}
+
+FLAVORS_OUTPUT_DIR=${OUTPUT_DIR}/flavors
+mkdir -p ${FLAVORS_OUTPUT_DIR}
+openstack flavor list > ${FLAVORS_OUTPUT_DIR}/list
+for i in $(openstack flavor list -c 'ID' -c 'Name' -f csv --quote none | grep -v ID); do
+    id=$(echo ${i} | cut -d, -f1)
+    name=$(echo ${i} | cut -d, -f2)
+    mkdir -p ${FLAVORS_OUTPUT_DIR}/${id}_${name}
+    openstack flavor show ${id} > ${FLAVORS_OUTPUT_DIR}/${id}_${name}/info
+done
+
+IMAGES_OUTPUT_DIR=${OUTPUT_DIR}/images
+mkdir -p ${IMAGES_OUTPUT_DIR}
+openstack image list > ${IMAGES_OUTPUT_DIR}/list
+for i in $(openstack image list -c 'ID' -c 'Name' -f csv --quote none | grep -v ID); do
+    id=$(echo ${i} | cut -d, -f1)
+    name=$(echo ${i} | cut -d, -f2)
+    mkdir -p ${IMAGES_OUTPUT_DIR}/${id}_${name}
+    openstack image show ${id} > ${IMAGES_OUTPUT_DIR}/${id}_${name}/info
+done
+
+KEYPAIRS_OUTPUT_DIR=${OUTPUT_DIR}/keypairs
+mkdir -p ${KEYPAIRS_OUTPUT_DIR}
+openstack keypair list > ${KEYPAIRS_OUTPUT_DIR}/list
+for i in $(openstack keypair list -c 'Name' -f value); do
+    mkdir -p ${KEYPAIRS_OUTPUT_DIR}/${i}
+    openstack keypair show ${i} > ${KEYPAIRS_OUTPUT_DIR}/${i}/info
+done
+
+SERVERGROUP_OUTPUT=${OUTPUT_DIR}/server_groups
+openstack server group list > ${SERVERGROUP_OUTPUT}
