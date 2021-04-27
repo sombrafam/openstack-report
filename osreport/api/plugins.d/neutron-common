@@ -1,4 +1,4 @@
-#!/bin/bash -eux
+#!/bin/bash
 
 OUTPUT_DIR=${OSREPORT_OUTPUT_DIR}/neutron_info
 mkdir -p ${OUTPUT_DIR}

@@ -1,0 +1,29 @@
+#!/bin/bash
+
+PORTS_OUTPUT=${OSREPORT_OUTPUT_DIR}/neutron_info/ports
+NETWORKS_OUTPUT=${OSREPORT_OUTPUT_DIR}/neutron_info/networks
+
+
+function get_server_ports () {
+    server_id=$1
+    for port_id in $(find ${PORTS_OUTPUT} -maxdepth 1 -mindepth 1  -type d -printf "%f\n"); do
+        device_id=$(cat ${PORTS_OUTPUT}/${port_id}/info | grep device_id| grep -oP '\b[0-9a-f]{8}\b-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-\b[0-9a-f]{12}\b')
+        if [ "${server_id}" == "${device_id}" ]; then
+            echo ${port_id}
+        fi
+    done
+}
+
+# Receives a port id and returns a the id of the network the port is connected
+# to.
+function get_port_network_id () {
+    port_id=$1
+    network_id=$(cat ${PORTS_OUTPUT}/${port_id}/info | grep network_id | grep -oP '\b[0-9a-f]{8}\b-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-\b[0-9a-f]{12}\b')
+    echo ${network_id}
+}
+
+function get_networks_name () {
+    network_id=$1
+    name=$(ls ${NETWORKS_OUTPUT}| grep ${network_id} | sed  -E  's/[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}_//')
+    echo ${name}
+}

@@ -18,7 +18,6 @@
 ## nova servers
 # openstack availability zone list - OK
 # openstack versions show - OK
-
 # openstack flavor list - OK
 # openstack flavor show - OK
 # openstack image list - OK
@@ -26,7 +25,6 @@
 # openstack image member list - WBD
 # openstack keypair list - OK
 # openstack keypair show - OK
-
 # openstack server list - OK
 # openstack server show - OK
 # openstack server event show - WBD
@@ -46,7 +44,6 @@
 # openstack group show - WBD
 # openstack identity provider list - OK
 # openstack identity provider show - WBD
-
 # openstack project list - OK
 # openstack project show - OK
 # openstack quota show - OK
@@ -54,6 +51,74 @@
 # openstack user show - OK
 # openstack role list - OK
 # openstack role show - OK
+
+## neutron
+# openstack network agent list - OK
+# openstack network agent show - OK
+# openstack network list - OK
+# openstack network show - OK
+# openstack subnet list - OK
+# openstack subnet show - OKnettraining
+# openstack port list - OK
+# openstack port show - OK
+
+# openstack ip availability list - OK
+# openstack ip availability show - WBD
+# openstack network flavor list - OK
+# openstack network flavor show - WBD
+# openstack network meter list - OK
+# openstack network meter show - WBD
+# openstack network segment list - OK
+# openstack network segment show - WBD
+# openstack network service provider list - OK
+# openstack network rbac list - OK
+# openstack network rbac show - OK
+# openstack subnet pool list - OK
+# openstack subnet pool show - OK
+# openstack security group list - OK
+# openstack security group rule list - WBD
+# openstack security group rule show - WBD
+# openstack security group show - OK
+
+# openstack floating ip list - OK
+# openstack floating ip show - OK
+
+# openstack router list - OK
+# openstack router show - OK
+
+## octavia
+# openstack loadbalancer list
+# openstack loadbalancer show
+# openstack loadbalancer stats show
+# openstack loadbalancer status show
+# openstack loadbalancer amphora list
+# openstack loadbalancer amphora show
+# openstack loadbalancer amphora stats show
+# openstack loadbalancer flavor list
+# openstack loadbalancer flavor show
+# openstack loadbalancer healthmonitor list
+# openstack loadbalancer healthmonitor show
+# openstack loadbalancer l7policy list
+# openstack loadbalancer l7policy show
+# openstack loadbalancer l7rule list
+# openstack loadbalancer l7rule show
+# openstack loadbalancer pool list
+# openstack loadbalancer pool show
+# openstack loadbalancer member list
+# openstack loadbalancer member show
+# openstack loadbalancer listener list
+# openstack loadbalancer listener show
+# openstack loadbalancer listener stats show
+
+## volume
+# openstack volume backup list
+# openstack volume backup show
+# openstack volume list
+# openstack volume show
+# openstack volume snapshot list
+# openstack volume snapshot show
+# openstack volume type list
+# openstack volume type show
 
 ## placement # --os-placement-api-version 1.6
 # openstack resource provider aggregate list
@@ -68,80 +133,3 @@
 # openstack resource provider trait set
 # openstack resource provider usage show
 # openstack resource usage show
-
-## neutron
-# openstack network agent list - OK
-# openstack network agent show - OK
-# openstack network list - OK
-# openstack network show - OK
-
-# openstack ip availability list
-# openstack ip availability show
-# openstack network flavor list
-# openstack network flavor show
-# openstack network meter list
-# openstack network meter show
-# openstack network rbac list
-# openstack network rbac show
-# openstack network segment list
-# openstack network segment show
-# openstack network service provider list
-# openstack subnet list
-# openstack subnet show
-# openstack subnet pool list
-# openstack subnet pool show
-# openstack port list
-# openstack port show
-# openstack router list
-# openstack router show
-# openstack security group list
-# openstack security group rule list
-# openstack security group rule show
-# openstack security group show
-# openstack floating ip list
-# openstack floating ip show
-
-## octavia
-# openstack loadbalancer list
-# openstack loadbalancer show
-# openstack loadbalancer stats show
-# openstack loadbalancer status show
-
-# openstack loadbalancer amphora list
-# openstack loadbalancer amphora show
-# openstack loadbalancer amphora stats show
-
-# openstack loadbalancer flavor list
-# openstack loadbalancer flavor show
-
-# openstack loadbalancer healthmonitor list
-# openstack loadbalancer healthmonitor show
-
-# openstack loadbalancer l7policy list
-# openstack loadbalancer l7policy show
-
-# openstack loadbalancer l7rule list
-# openstack loadbalancer l7rule show
-
-# openstack loadbalancer pool list
-# openstack loadbalancer pool show
-# openstack loadbalancer member list
-# openstack loadbalancer member show
-
-# openstack loadbalancer listener list
-# openstack loadbalancer listener show
-# openstack loadbalancer listener stats show
-
-
-## volume
-# openstack volume backup list
-# openstack volume backup show
-
-# openstack volume list
-# openstack volume show
-
-# openstack volume snapshot list
-# openstack volume snapshot show
-
-# openstack volume type list
-# openstack volume type show

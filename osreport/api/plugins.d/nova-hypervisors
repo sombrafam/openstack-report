@@ -1,4 +1,4 @@
-#!/bin/bash -eu
+#!/bin/bash
 
 OUTPUT_DIR=${OSREPORT_OUTPUT_DIR}/nova-hypervisors_info
 mkdir -p ${OUTPUT_DIR}

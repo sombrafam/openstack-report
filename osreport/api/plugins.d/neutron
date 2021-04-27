@@ -1,27 +1,78 @@
-#!/bin/bash -eu
+#!/bin/bash
+. helpers/neutron-helpers
 
 OUTPUT_DIR=${OSREPORT_OUTPUT_DIR}/neutron_info
 mkdir -p ${OUTPUT_DIR}
 
-NETWORKS_OUTPUT_DIR=${OUTPUT_DIR}/networks
-mkdir -p ${NETWORKS_OUTPUT_DIR}
-openstack network list > ${NETWORKS_OUTPUT_DIR}/list
-for i in $(openstack network list -c ID -f value); do
-    mkdir -p ${NETWORKS_OUTPUT_DIR}/${i}
-    openstack network show ${i} > ${NETWORKS_OUTPUT_DIR}/${i}/info
-    mkdir -p ${NETWORKS_OUTPUT_DIR}/${i}/ports
-    openstack port list --network ${i} > ${NETWORKS_OUTPUT_DIR}/${i}/ports/list
-    for j in $(openstack port list --network ${i} -c ID -f value); do
-        ln -rs ${OUTPUT_DIR}/ports/${j} ${NETWORKS_OUTPUT_DIR}/${i}/ports/${j}
-    done
-done
+openstack ip availability list > ${OUTPUT_DIR}/ip_availability_list
+openstack network flavor list > ${OUTPUT_DIR}/flavor_list
+openstack network meter list > ${OUTPUT_DIR}/meter_list
+openstack network segment list > ${OUTPUT_DIR}/segment_list
+openstack network service provider list > ${OUTPUT_DIR}/service_provider_list
 
 SUBNETS_OUTPUT_DIR=${OUTPUT_DIR}/subnets
 mkdir -p ${SUBNETS_OUTPUT_DIR}
 openstack subnet list > ${SUBNETS_OUTPUT_DIR}/list
-for i in $(openstack subnet list -c ID -f value); do
-    mkdir -p ${SUBNETS_OUTPUT_DIR}/${i}
-    openstack subnet show ${i} > ${SUBNETS_OUTPUT_DIR}/${i}/info
+tmp=${IFS} && IFS=$'\n' # This is to handle names with whitespaces
+for i in $(openstack subnet list -c 'ID' -c 'Name' -f csv --quote none | grep -v ID); do
+    id=$(echo ${i} | cut -d, -f1)
+    name=$(echo ${i} | cut -d, -f2)
+    mkdir -p "${SUBNETS_OUTPUT_DIR}/${id}_${name}"
+    openstack subnet show ${id} > "${SUBNETS_OUTPUT_DIR}/${id}_${name}/info"
+done
+IFS=${tmp}
+
+NETWORKS_OUTPUT_DIR=${OUTPUT_DIR}/networks
+mkdir -p ${NETWORKS_OUTPUT_DIR}
+openstack network list > ${NETWORKS_OUTPUT_DIR}/list
+tmp=${IFS} && IFS=$'\n'
+for i in $(openstack network list -c 'ID' -c 'Name' -f csv --quote none | grep -v ID); do
+    id=$(echo ${i} | cut -d, -f1)
+    name=$(echo ${i} | cut -d, -f2)
+
+    mkdir -p "${NETWORKS_OUTPUT_DIR}/${id}_${name}"
+    openstack network show ${id} > "${NETWORKS_OUTPUT_DIR}/${id}_${name}/info"
+    mkdir -p "${NETWORKS_OUTPUT_DIR}/${id}_${name}/ports"
+    openstack port list --network ${id} > "${NETWORKS_OUTPUT_DIR}/${id}_${name}/ports/list"
+    for j in $(openstack port list --network ${id} -c ID -f value); do
+        ln -rs ${OUTPUT_DIR}/ports/${j} "${NETWORKS_OUTPUT_DIR}/${id}_${name}/ports/${j}"
+    done
+
+    mkdir -p "${NETWORKS_OUTPUT_DIR}/${id}_${name}/subnets"
+    openstack subnet list --network ${id} > "${NETWORKS_OUTPUT_DIR}/${id}_${name}/subnets/list"
+    for j in $(openstack subnet list --network ${id} -c 'ID' -c 'Name' -f csv --quote none | grep -v ID); do
+        subnet_id=$(echo ${j} | cut -d, -f1)
+        subnet_name=$(echo ${j} | cut -d, -f2)
+        ln -rs "${OUTPUT_DIR}/subnets/${subnet_id}_${subnet_name}" "${NETWORKS_OUTPUT_DIR}/${id}_${name}/subnets/${subnet_id}_${subnet_name}"
+    done
+
+    mkdir -p "${NETWORKS_OUTPUT_DIR}/${id}_${name}/servers"
+    for server in $(find ${OSREPORT_OUTPUT_DIR}/nova_info/servers/ -maxdepth 1 -mindepth 1  -type d -printf "%f\n"); do
+        for port in $(get_server_ports ${server}); do
+            network_id=$(get_port_network_id ${port})
+            if [ ${id} == ${network_id} ]; then
+                ln -rs ${OSREPORT_OUTPUT_DIR}/nova_info/servers/${server} "${NETWORKS_OUTPUT_DIR}/${id}_${name}/servers/${server}"
+            fi
+        done
+    done
+
+done
+IFS=${tmp}
+
+RBAC_OUTPUT_DIR=${OUTPUT_DIR}/rbacs
+mkdir -p ${RBAC_OUTPUT_DIR}
+openstack network rbac list > ${RBAC_OUTPUT_DIR}/list
+for i in $(openstack network rbac list -c ID -f value); do
+    mkdir -p ${RBAC_OUTPUT_DIR}/${i}
+    openstack network rbac show ${i} > ${RBAC_OUTPUT_DIR}/${i}/info
+done
+
+SUBNET_POOLS_OUTPUT_DIR=${OUTPUT_DIR}/subnet_pools
+mkdir -p ${SUBNET_POOLS_OUTPUT_DIR}
+openstack subnet pool list > ${SUBNET_POOLS_OUTPUT_DIR}/list
+for i in $(openstack subnet pool list -c ID -f value); do
+    mkdir -p ${SUBNET_POOLS_OUTPUT_DIR}/${i}
+    openstack subnet pool show ${i} > ${SUBNET_POOLS_OUTPUT_DIR}/${i}/info
 done
 
 SECGROUP_OUTPUT_DIR=${OUTPUT_DIR}/secgroups
@@ -32,6 +83,26 @@ for i in $(openstack security group list -c ID -f value); do
     openstack security group show ${i} > ${SECGROUP_OUTPUT_DIR}/${i}/info
 done
 
+PORTS_OUTPUT_DIR=${OUTPUT_DIR}/ports
+for i in $(find ${PORTS_OUTPUT_DIR} -mindepth 1 -type d); do
+    port=$(echo $i | awk -F'/' '{print $NF}')
+    secgroups=$(cat ${i}/info | grep security_group_ids | awk -F'|' '{print $3}' | sed -E "s/\\s//g")
+    tmp=${IFS} && IFS=','
+    for group in ${secgroups}; do
+        mkdir -p ${PORTS_OUTPUT_DIR}/${port}/secgroups
+        ln -rs ${OUTPUT_DIR}/secgroups/${group} ${PORTS_OUTPUT_DIR}/${port}/secgroups/${group}
+    done
+    IFS=${tmp}
+done
+
+FIPS_OUTPUT_DIR=${OUTPUT_DIR}/floating_ips
+mkdir -p ${FIPS_OUTPUT_DIR}
+openstack floating ip list > ${FIPS_OUTPUT_DIR}/list
+for i in $(openstack floating ip list -c ID -f value); do
+    mkdir -p ${FIPS_OUTPUT_DIR}/${i}
+    openstack floating ip show ${i} > ${FIPS_OUTPUT_DIR}/${i}/info
+done
+
 ROUTERS_OUTPUT_DIR=${OUTPUT_DIR}/routers
 mkdir -p ${ROUTERS_OUTPUT_DIR}
 openstack router list > ${ROUTERS_OUTPUT_DIR}/list
@@ -40,8 +111,14 @@ for i in $(openstack router list -c ID -f value); do
     openstack router show ${i} > ${ROUTERS_OUTPUT_DIR}/${i}/info
 
     mkdir -p ${ROUTERS_OUTPUT_DIR}/${i}/ports
+    mkdir -p ${ROUTERS_OUTPUT_DIR}/${i}/networks
     openstack port list --router ${i} > ${ROUTERS_OUTPUT_DIR}/${i}/ports/list
     for j in $(openstack port list --router ${i} -c ID -f value); do
         ln -rs ${OUTPUT_DIR}/ports/${j} ${ROUTERS_OUTPUT_DIR}/${i}/ports/${j}
+        network_id=$(get_port_network_id ${j})
+        network_name=$(get_networks_name ${network_id})
+        if [ ! -L  "${ROUTERS_OUTPUT_DIR}/${i}/networks/${network_id}_${network_name}" ] ; then
+            ln -rs "${OUTPUT_DIR}/networks/${network_id}_${network_name}" "${ROUTERS_OUTPUT_DIR}/${i}/networks/${network_id}_${network_name}"
+        fi
     done
 done

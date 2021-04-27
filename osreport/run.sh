@@ -1,4 +1,4 @@
-#!/bin/bash -u
+#!/bin/bash
 export LIB_PATH=$(dirname $0)/../lib
 
 export OSREPORT_OUTPUT_DIR=$(mktemp -d -p . osreport.XXXXXX)
