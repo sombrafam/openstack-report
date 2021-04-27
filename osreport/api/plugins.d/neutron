@@ -5,10 +5,10 @@ OUTPUT_DIR=${OSREPORT_OUTPUT_DIR}/neutron_info
 mkdir -p ${OUTPUT_DIR}
 
 openstack ip availability list > ${OUTPUT_DIR}/ip_availability_list
-openstack network flavor list > ${OUTPUT_DIR}/flavor_list
-openstack network meter list > ${OUTPUT_DIR}/meter_list
-openstack network segment list > ${OUTPUT_DIR}/segment_list
-openstack network service provider list > ${OUTPUT_DIR}/service_provider_list
+openstack network flavor list > ${OUTPUT_DIR}/network_flavor_list
+openstack network meter list > ${OUTPUT_DIR}/network_meter_list
+openstack network segment list > ${OUTPUT_DIR}/network_segment_list
+openstack network service provider list > ${OUTPUT_DIR}/network_service_provider_list
 
 SUBNETS_OUTPUT_DIR=${OUTPUT_DIR}/subnets
 mkdir -p ${SUBNETS_OUTPUT_DIR}
