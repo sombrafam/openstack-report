@@ -101,6 +101,7 @@ openstack floating ip list > ${FIPS_OUTPUT_DIR}/list
 for i in $(openstack floating ip list -c ID -f value); do
     mkdir -p ${FIPS_OUTPUT_DIR}/${i}
     openstack floating ip show ${i} > ${FIPS_OUTPUT_DIR}/${i}/info
+    # TODO: link associated ports in both ways
 done
 
 ROUTERS_OUTPUT_DIR=${OUTPUT_DIR}/routers

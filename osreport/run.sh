@@ -57,7 +57,7 @@ EOF
 
 # x is a dummy value just so the script does not break when OS_REPORT_DEBUG is
 # not set.
-if [[ -z ${OS_REPORT_DEBUG+x} ]]; then
+if [[ ! -z ${OS_REPORT_DEBUG+x} ]]; then
     set -x
     openstack --version
 fi

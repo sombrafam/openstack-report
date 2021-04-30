@@ -1,85 +1,120 @@
 #!/bin/bash
+. helpers/neutron-helpers
 
 OUTPUT_DIR=${OSREPORT_OUTPUT_DIR}/octavia_info
 mkdir -p ${OUTPUT_DIR}
 
-openstack loadbalancer list > ${OUTPUT_DIR}/openstack_loadbalancer_list.out
-mkdir -p ${OUTPUT_DIR}/loadbalancer_info
-mkdir -p ${OUTPUT_DIR}/loadbalancer_stats
-mkdir -p ${OUTPUT_DIR}/loadbalancer_status
+LBS_OUTPUT_DIR=${OUTPUT_DIR}/loadbalancers
+mkdir -p ${LBS_OUTPUT_DIR}
+
+openstack loadbalancer list > ${LBS_OUTPUT_DIR}/list
 for i in $(openstack loadbalancer list -c id -f value); do
-    openstack loadbalancer show ${i} > ${OUTPUT_DIR}/loadbalancer_info/${i}.out
-    openstack loadbalancer stats show ${i} > ${OUTPUT_DIR}/loadbalancer_stats/${i}.out
-    openstack loadbalancer status show ${i} > ${OUTPUT_DIR}/loadbalancer_status/${i}.out
+    mkdir -p ${LBS_OUTPUT_DIR}/${i}
+    openstack loadbalancer show ${i} > ${LBS_OUTPUT_DIR}/${i}/info
+    openstack loadbalancer stats show ${i} > ${LBS_OUTPUT_DIR}/${i}/stats
+    openstack loadbalancer status show ${i} > ${LBS_OUTPUT_DIR}/${i}/status
 done
 
-openstack loadbalancer amphora list > ${OUTPUT_DIR}/openstack_loadbalancer_amphora_list.out
-mkdir -p ${OUTPUT_DIR}/amphora_info
-mkdir -p ${OUTPUT_DIR}/amphora_stats
+AMPHORAS_OUTPUT_DIR=${OUTPUT_DIR}/amphoras
+mkdir -p ${AMPHORAS_OUTPUT_DIR}
+openstack loadbalancer amphora list > ${AMPHORAS_OUTPUT_DIR}/list
 for i in $(openstack loadbalancer amphora list -c id -f value); do
-    openstack loadbalancer amphora show ${i} > ${OUTPUT_DIR}/amphora_info/${i}.out
-    openstack loadbalancer amphora stats show ${i} > ${OUTPUT_DIR}/amphora_stats/${i}.out
+    mkdir -p ${AMPHORAS_OUTPUT_DIR}/${i}
+    openstack loadbalancer amphora show ${i} > ${AMPHORAS_OUTPUT_DIR}/${i}/info
+    openstack loadbalancer amphora stats show ${i} > ${AMPHORAS_OUTPUT_DIR}/${i}/stats
+
+    loadbalancer_id=$(cat ${AMPHORAS_OUTPUT_DIR}/${i}/info | grep loadbalancer_id | awk -F'|' '{print $3}'|sed -E s/\\s//g)
+    compute_id=$(cat ${AMPHORAS_OUTPUT_DIR}/${i}/info | grep compute_id | awk -F'|' '{print $3}'|sed -E s/\\s//g)
+    vrrp_port_id=$(cat ${AMPHORAS_OUTPUT_DIR}/${i}/info | grep vrrp_port_id | awk -F'|' '{print $3}'|sed -E s/\\s//g)
+    ha_port_id=$(cat ${AMPHORAS_OUTPUT_DIR}/${i}/info | grep ha_port_id | awk -F'|' '{print $3}'|sed -E s/\\s//g)
+
+    ln -rs ${LBS_OUTPUT_DIR}/${loadbalancer_id} ${AMPHORAS_OUTPUT_DIR}/${i}/loadbalancer
+    mkdir -p ${LBS_OUTPUT_DIR}/${loadbalancer_id}/amphoras/
+    ln -rs ${AMPHORAS_OUTPUT_DIR}/${i} ${LBS_OUTPUT_DIR}/${loadbalancer_id}/amphoras/${i}
+    ln -rs ${OSREPORT_OUTPUT_DIR}/nova_info/servers/${compute_id} ${AMPHORAS_OUTPUT_DIR}/${i}/compute
+    ln -rs ${OSREPORT_OUTPUT_DIR}/neutron_info/ports/${vrrp_port_id} ${AMPHORAS_OUTPUT_DIR}/${i}/vrrp_port
+    ln -rs ${OSREPORT_OUTPUT_DIR}/neutron_info/ports/${ha_port_id} ${AMPHORAS_OUTPUT_DIR}/${i}/ha_port
 done
 
-openstack loadbalancer availabilityzone list > ${OUTPUT_DIR}/openstack_loadbalancer_availabilityzone_list.out
-mkdir -p ${OUTPUT_DIR}/availabilityzone_info
-for i in $(openstack loadbalancer availabilityzone list -c id -f value); do
-    openstack loadbalancer availabilityzone show ${i} > ${OUTPUT_DIR}/availabilityzone_info/${i}.out
-done
-
-openstack loadbalancer flavor list > ${OUTPUT_DIR}/openstack_loadbalancer_flavor_list.out
-mkdir -p ${OUTPUT_DIR}/flavor_info
-for i in $(openstack loadbalancer flavor list -c id -f value); do
-    openstack loadbalancer flavor show ${i} > ${OUTPUT_DIR}/flavor_info/${i}.out
-done
-
-openstack loadbalancer flavorprofile list > ${OUTPUT_DIR}/openstack_loadbalancer_flavorprofile_list.out
-mkdir -p ${OUTPUT_DIR}/flavorprofile_info
-for i in $(openstack loadbalancer flavorprofile list -c id -f value); do
-    openstack loadbalancer flavorprofile show ${i} > ${OUTPUT_DIR}/flavorprofile_info/${i}.out
-done
-
-openstack loadbalancer healthmonitor list > ${OUTPUT_DIR}/openstack_loadbalancer_healthmonitor_list.out
-mkdir -p ${OUTPUT_DIR}/healthmonitor_info
+POOLS_OUTPUT_DIR=${OUTPUT_DIR}/pools
+HMONITORS_OUTPUT_DIR=${OUTPUT_DIR}/healthmonitors
+mkdir -p ${HMONITORS_OUTPUT_DIR}
+openstack loadbalancer healthmonitor list > ${HMONITORS_OUTPUT_DIR}/list
 for i in $(openstack loadbalancer healthmonitor list -c id -f value); do
-    openstack loadbalancer healthmonitor show ${i} > ${OUTPUT_DIR}/healthmonitor_info/${i}.out
+    mkdir -p ${HMONITORS_OUTPUT_DIR}/${i}
+    openstack loadbalancer healthmonitor show ${i} -f json > ${HMONITORS_OUTPUT_DIR}/${i}/info
+    mkdir -p ${HMONITORS_OUTPUT_DIR}/${i}/pools
+    pools=$(cat ${HMONITORS_OUTPUT_DIR}/${i}/info | jq .'pools' |  sed -E 's/\\n/ /g' | sed -E 's/"//g')
+    for j in ${pools}; do
+        ln -rs ${POOLS_OUTPUT_DIR}/${j} ${HMONITORS_OUTPUT_DIR}/${i}/pools/${j}
+    done
 done
 
-openstack loadbalancer l7policy list > ${OUTPUT_DIR}/openstack_loadbalancer_l7policy_list.out
-mkdir -p ${OUTPUT_DIR}/l7policy_info
+POLICIES_OUTPUT_DIR=${OUTPUT_DIR}/policies
+mkdir -p ${POLICIES_OUTPUT_DIR}
+openstack loadbalancer l7policy list > ${POLICIES_OUTPUT_DIR}/list
 for i in $(openstack loadbalancer l7policy list -c id -f value); do
-    openstack loadbalancer l7policy show ${i} > ${OUTPUT_DIR}/l7policy_info/${i}.out
-    openstack loadbalancer l7rule list ${i} > ${OUTPUT_DIR}/l7policy_info/${i}_rules.out
-    mkdir -p ${OUTPUT_DIR}/l7policy_info/${i}_rules_info
-    mkdir -p ${OUTPUT_DIR}/l7rule_info
+    mkdir -p ${POLICIES_OUTPUT_DIR}/${i}
+    openstack loadbalancer l7policy show ${i} -f json > ${POLICIES_OUTPUT_DIR}/${i}/info
+    mkdir -p ${POLICIES_OUTPUT_DIR}/${i}/rules
     for j in $(openstack loadbalancer l7rule list ${i} -c id -f value); do
-        openstack loadbalancer l7rule show ${i} ${j} > ${OUTPUT_DIR}/l7rule_info/${j}.out
+        mkdir -p ${POLICIES_OUTPUT_DIR}/${i}/rules/${j}
+        openstack loadbalancer l7rule show ${i} ${j} > ${POLICIES_OUTPUT_DIR}/${i}/rules/${j}/info
     done
+    redirect_pool_id=$(cat ${POLICIES_OUTPUT_DIR}/${i}/info | jq -r .'redirect_pool_id')
+    ln -rs ${POOLS_OUTPUT_DIR}/${redirect_pool_id} ${POLICIES_OUTPUT_DIR}/${i}/redirect_pool
 done
 
-openstack loadbalancer listener list > ${OUTPUT_DIR}/openstack_loadbalancer_listener_list.out
-mkdir -p ${OUTPUT_DIR}/listener_info
-mkdir -p ${OUTPUT_DIR}/listener_stats
-for i in $(openstack loadbalancer listener list -c id -f value); do
-    openstack loadbalancer listener show ${i} > ${OUTPUT_DIR}/listener_info/${i}.out
-    openstack loadbalancer listener stats show ${i} > ${OUTPUT_DIR}/listener_stats/${i}.out
-done
+openstack loadbalancer pool list > ${POOLS_OUTPUT_DIR}/list
+LISTENERS_OUTPUT_DIR=${OUTPUT_DIR}/listeners
+mkdir -p ${LISTENERS_OUTPUT_DIR}
 
-openstack loadbalancer pool list > ${OUTPUT_DIR}/openstack_loadbalancer_pool_list.out
-mkdir -p ${OUTPUT_DIR}/pool_info
+mkdir -p ${POOLS_OUTPUT_DIR}
 for i in $(openstack loadbalancer pool list -c id -f value); do
-    openstack loadbalancer pool show ${i} > ${OUTPUT_DIR}/pool_info/${i}.out
-    openstack loadbalancer member list ${i} > ${OUTPUT_DIR}/pool_info/${i}_member_list.out
-    mkdir -p ${OUTPUT_DIR}/pool_info/${i}_member_list_info
-    for j in $(openstack loadbalancer member list ${i} -c id -f value); do
-        openstack loadbalancer member show ${i} ${j} > ${OUTPUT_DIR}/pool_info/${i}_member_list_info/${j}.out
+    mkdir -p ${POOLS_OUTPUT_DIR}/${i}
+    openstack loadbalancer pool show -f json ${i} > ${POOLS_OUTPUT_DIR}/${i}/info
+
+    healthmonitor_id=$(cat ${POOLS_OUTPUT_DIR}/${i}/info | jq -r .'healthmonitor_id')
+    ln -rs ${HMONITORS_OUTPUT_DIR}/${healthmonitor_id} ${POOLS_OUTPUT_DIR}/${i}/healthmonitor
+
+    members=$(cat ${POOLS_OUTPUT_DIR}/${i}/info | jq .'members' |  sed -E 's/\\n/ /g' | sed -E 's/"//g')
+    mkdir -p ${POOLS_OUTPUT_DIR}/${i}/members/
+    for j in ${members}; do
+        mkdir -p ${POOLS_OUTPUT_DIR}/${i}/members/${j}
+
+        openstack loadbalancer member show ${i} ${j} -f json > ${POOLS_OUTPUT_DIR}/${i}/members/${j}/info
+        ip=$(cat ${POOLS_OUTPUT_DIR}/${i}/members/${j}/info | jq -r .'address')
+        server=$(get_ips_server ${ip})
+        ln -rs ${OSREPORT_OUTPUT_DIR}/nova_info/servers/${server} ${POOLS_OUTPUT_DIR}/${i}/members/${j}/server
+    done
+
+    mkdir -p ${POOLS_OUTPUT_DIR}/${i}/listeners/
+    listeners=$(cat ${POOLS_OUTPUT_DIR}/${i}/info | jq .'listeners' |  sed -E 's/\\n/ /g' | sed -E 's/"//g')
+    for j in ${listeners}; do
+        ln -sr ${LISTENERS_OUTPUT_DIR}/${j} ${POOLS_OUTPUT_DIR}/${i}/listeners/${j}
+    done
+
+    loadbalancers=$(cat ${POOLS_OUTPUT_DIR}/${i}/info | jq .'loadbalancers' |  sed -E 's/\\n/ /g' | sed -E 's/"//g')
+    for j in ${loadbalancers}; do
+        mkdir -p ${POOLS_OUTPUT_DIR}/${i}/loadbalancers/
+        ln -sr ${LBS_OUTPUT_DIR}/${j} ${POOLS_OUTPUT_DIR}/${i}/loadbalancers/${j}
     done
 done
 
-openstack loadbalancer quota defaults show > ${OUTPUT_DIR}/openstack_loadbalancer_quota_defaults_show.out
+openstack loadbalancer listener list > ${LISTENERS_OUTPUT_DIR}/list
+for i in $(openstack loadbalancer listener list -c id -f value); do
+    mkdir -p ${LISTENERS_OUTPUT_DIR}/${i}
+    openstack loadbalancer listener show ${i} -f json > ${LISTENERS_OUTPUT_DIR}/${i}/info
 
-openstack loadbalancer quota list > ${OUTPUT_DIR}/openstack_loadbalancer_quota_list.out
-mkdir -p ${OUTPUT_DIR}/quota_info
-for i in $(openstack loadbalancer quota list -c project_id -f value); do
-    openstack loadbalancer quota show ${i} > ${OUTPUT_DIR}/quota_info/${i}.out
+    l7policies=$(cat ${LISTENERS_OUTPUT_DIR}/${i}/info | jq .'l7policies' |  sed -E 's/\\n/ /g' | sed -E 's/"//g')
+    for j in ${l7policies}; do
+        mkdir -p ${LISTENERS_OUTPUT_DIR}/${i}/policies
+        ln -sr ${POLICIES_OUTPUT_DIR}/${j} ${LISTENERS_OUTPUT_DIR}/${i}/policies/${j}
+    done
+
+    loadbalancers=$(cat ${LISTENERS_OUTPUT_DIR}/${i}/info | jq .'loadbalancers' |  sed -E 's/\\n/ /g' | sed -E 's/"//g')
+    for j in ${loadbalancers}; do
+        mkdir -p ${LISTENERS_OUTPUT_DIR}/${i}/loadbalancers
+        ln -sr ${LBS_OUTPUT_DIR}/${j} ${LISTENERS_OUTPUT_DIR}/${i}/loadbalancers/${j}
+    done
 done

@@ -27,3 +27,9 @@ function get_networks_name () {
     name=$(ls ${NETWORKS_OUTPUT}| grep ${network_id} | sed  -E  's/[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}_//')
     echo ${name}
 }
+
+function get_ips_server () {
+    ip=$1
+    port_id=$(openstack port list | grep ${ip} | awk -F'|' '{print $2}' | sed -E 's/\s//g')
+    echo "$(cat ${PORTS_OUTPUT}/${port_id}/info | grep device_id| awk -F'|' '{print $3}' | sed -E 's/\s//g')"
+}
