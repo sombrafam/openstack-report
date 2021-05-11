@@ -50,7 +50,7 @@ Environment:
     OS_USERNAME
     OS_USER_DOMAIN_NAME
 
-    # Won't compress the results and print debug information
+    # Will leave uncompressed results and print debug information
     OS_REPORT_DEBUG
 EOF
 }
