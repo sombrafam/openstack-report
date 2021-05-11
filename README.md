@@ -2,7 +2,7 @@
 
 Collects OpenStack information for a cloud.
 
-Usage: openstack-toolkit.osreport <options>
+Usage: osreport <options>
 
 Description:
     Collects OpenStack information for a cloud and builds useful relations

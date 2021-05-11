@@ -1,4 +1,4 @@
-name: os-report
+name: osreport
 version: '1.0'
 summary: Toolkit for debugging Openstack
 description:

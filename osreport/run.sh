@@ -27,7 +27,7 @@ check_plugin_list(){
 
 usage () {
 cat << EOF
-Usage: os-report <options>
+Usage: osreport <options>
 
 Description:
     Collects OpenStack information for a cloud and builds useful relations
