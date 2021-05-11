@@ -87,28 +87,28 @@
 # openstack router show - OK
 
 ## octavia
-# openstack loadbalancer list
-# openstack loadbalancer show
-# openstack loadbalancer stats show
-# openstack loadbalancer status show
-# openstack loadbalancer amphora list
-# openstack loadbalancer amphora show
-# openstack loadbalancer amphora stats show
+# openstack loadbalancer list - OK
+# openstack loadbalancer show - OK
+# openstack loadbalancer stats show - OK
+# openstack loadbalancer status show - OK
+# openstack loadbalancer amphora list - OK
+# openstack loadbalancer amphora show - OK
+# openstack loadbalancer amphora stats show - OK
 # openstack loadbalancer flavor list
 # openstack loadbalancer flavor show
-# openstack loadbalancer healthmonitor list
-# openstack loadbalancer healthmonitor show
-# openstack loadbalancer l7policy list
-# openstack loadbalancer l7policy show
-# openstack loadbalancer l7rule list
-# openstack loadbalancer l7rule show
-# openstack loadbalancer pool list
-# openstack loadbalancer pool show
-# openstack loadbalancer member list
-# openstack loadbalancer member show
-# openstack loadbalancer listener list
-# openstack loadbalancer listener show
-# openstack loadbalancer listener stats show
+# openstack loadbalancer healthmonitor list - OK
+# openstack loadbalancer healthmonitor show - OK
+# openstack loadbalancer l7policy list - OK
+# openstack loadbalancer l7policy show - OK
+# openstack loadbalancer l7rule list - OK
+# openstack loadbalancer l7rule show - OK
+# openstack loadbalancer pool list - OK
+# openstack loadbalancer pool show - OK
+# openstack loadbalancer member list - OK
+# openstack loadbalancer member show - OK
+# openstack loadbalancer listener list - OK
+# openstack loadbalancer listener show - OK
+# openstack loadbalancer listener stats show - OK
 
 ## volume
 # openstack volume backup list
