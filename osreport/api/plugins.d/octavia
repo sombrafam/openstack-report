@@ -1,5 +1,5 @@
 #!/bin/bash
-. helpers/neutron-helpers
+. ${HELPERS_PATH}/neutron-helpers
 
 OUTPUT_DIR=${OSREPORT_OUTPUT_DIR}/octavia_info
 mkdir -p ${OUTPUT_DIR}
@@ -65,11 +65,11 @@ for i in $(openstack loadbalancer l7policy list -c id -f value); do
     ln -rs ${POOLS_OUTPUT_DIR}/${redirect_pool_id} ${POLICIES_OUTPUT_DIR}/${i}/redirect_pool
 done
 
+mkdir -p ${POOLS_OUTPUT_DIR}
 openstack loadbalancer pool list > ${POOLS_OUTPUT_DIR}/list
 LISTENERS_OUTPUT_DIR=${OUTPUT_DIR}/listeners
 mkdir -p ${LISTENERS_OUTPUT_DIR}
 
-mkdir -p ${POOLS_OUTPUT_DIR}
 for i in $(openstack loadbalancer pool list -c id -f value); do
     mkdir -p ${POOLS_OUTPUT_DIR}/${i}
     openstack loadbalancer pool show -f json ${i} > ${POOLS_OUTPUT_DIR}/${i}/info

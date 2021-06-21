@@ -1,5 +1,5 @@
 name: osreport
-version: '1.1'
+version: '1.2'
 summary: Toolkit for debugging Openstack
 description:
   Collects information from OpenStack Clouds
