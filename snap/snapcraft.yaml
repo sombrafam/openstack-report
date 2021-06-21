@@ -1,36 +1,35 @@
 name: osreport
-version: '1.0'
+version: '1.1'
 summary: Toolkit for debugging Openstack
 description:
   Collects information from OpenStack Clouds
 confinement: strict
 grade: stable
-base: core18
+base: core20
 environment:
   TMPDIR: $SNAP_COMMON/tmp
   # need this due to pip python-certifi used by python-openstackclient
   REQUESTS_CA_BUNDLE: /etc/ssl/certs/ca-certificates.crt
 
 apps:
-  octavia:
+  osreport:
     command: osreport/run.sh
     plugs: [home, network]
 parts:
-  octavia-checks:
+  checks:
     source: .
     plugin: dump
     stage-packages:
       - coreutils
       - bsdmainutils
-      - ipcalc
       - jq
       - curl
   openstackclients:
     plugin: python
-    python-version: python3
+
     python-packages:
       - python-openstackclient
-    constraints: https://raw.githubusercontent.com/openstack/requirements/stable/ussuri/upper-constraints.txt
+      - python-octaviaclient
     build-packages:
       - libffi-dev
       - libssl-dev

@@ -1,6 +1,12 @@
 #!/bin/bash
-export LIB_PATH=$(dirname $0)/../lib
+# x is a dummy value just so the script does not break when OS_REPORT_DEBUG is
+# not set.
+if [[ ! -z ${OS_REPORT_DEBUG+x} ]]; then
+    set -x
+    openstack --version
+fi
 
+export HELPERS_PATH=$(dirname $0)/helpers
 export OSREPORT_OUTPUT_DIR=$(mktemp -d -p . osreport.XXXXXX)
 
 SUPPORTED_PLUGINS="neutron,nova,octavia,nova-hypervisors,keystone"
@@ -54,13 +60,6 @@ Environment:
     OS_REPORT_DEBUG
 EOF
 }
-
-# x is a dummy value just so the script does not break when OS_REPORT_DEBUG is
-# not set.
-if [[ ! -z ${OS_REPORT_DEBUG+x} ]]; then
-    set -x
-    openstack --version
-fi
 
 plugins=${SUPPORTED_PLUGINS}
 while (($#)); do
