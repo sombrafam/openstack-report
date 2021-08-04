@@ -119,9 +119,11 @@ for plugin in ${plugins}; do
     . ${api_plugins}/${plugin}
 done
 
-echo "Compressing results..."
-REPORT_NAME="osreport-$(date +%Y-%m-%d_%H%M).tar.xz"
-tar -Jcvf ${REPORT_NAME} ${OSREPORT_OUTPUT_DIR} &> /dev/null
+# Compressing the results was not working from inside the snap for some reason.
+# So, we are just packing them.
+echo "Packing the results..."
+REPORT_NAME="osreport-$(date +%Y-%m-%d_%H%M).tar"
+tar -cvf ${REPORT_NAME} ${OSREPORT_OUTPUT_DIR} &> /dev/null
 
 if [[ -z ${OS_REPORT_DEBUG+x} ]]; then
     echo "Done. Report created in ${REPORT_NAME}"

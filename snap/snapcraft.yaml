@@ -1,5 +1,5 @@
 name: osreport
-version: '1.2'
+version: '1.3'
 summary: Toolkit for debugging Openstack
 description:
   Collects information from OpenStack Clouds
@@ -24,6 +24,7 @@ parts:
       - bsdmainutils
       - jq
       - curl
+      - tar
   openstackclients:
     plugin: python
 
